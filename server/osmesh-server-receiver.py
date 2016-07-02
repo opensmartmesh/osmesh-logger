@@ -11,7 +11,7 @@ class Server():
 
         TODO have default values and user values as input
         '''
-        self.Serial_port = serial_port
+        self.serial_port     = serial_port
         self.serial_baudrate = 115200
         self.serial_parity   = serial.PARITY_ODD
         self.serial_timeout  = None
@@ -27,8 +27,8 @@ class Server():
         rline  = ""
         prevch = ''
         while True:
-            # ch     = str(port.read(), encoding="utf-7")
-            ch     = str(port.read())
+            ch     = str(port.read(), encoding="utf-7")
+            #ch     = str(port.read())
             rline += ch
             if (prevch=='\r' or  ch=='\n') or ch=='':
                 return rline
@@ -41,7 +41,7 @@ class Server():
         return node_number, sensor_type, sensor_value
         
     def run(self):
-        port = serial.Serial(self.Serial_port, 
+        port = serial.Serial(self.serial_port, 
             baudrate = self.serial_baudrate, 
             timeout  = self.serial_timeout,
             parity   = self.serial_parity,
@@ -51,16 +51,20 @@ class Server():
             print("--- Listening...")
             rline = self.readlineCR(port)
             try:
+                print("Parsing line: "+rline)
                 node_number, sensor_type, sensor_value = self.parse_line(rline)
                 self.df.loc[self.row_iter] =  [datetime.datetime.utcnow(),node_number, sensor_type, float(sensor_value)]
                 self.row_iter += 1
                 self.df.to_csv('../../test.csv',index = False)
 
             except ValueError:
-                print len(rline),rline
+                print("ValueError Exception")
+                print(str(len(rline))+" "+rline)
             print("--- Received: "+rline+"\n")
 
 if  __name__ =='__main__':
     if len(sys.argv) > 1:
         A = Server(sys.argv[1])
         A.run()
+    else:
+        print("Missing serial port pathname")
