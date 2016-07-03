@@ -35,9 +35,33 @@ class Server():
             prevch=ch
 
     def parse_line(self,line_str):
-        coma_list = line_str.split(',')
-        node_number = coma_list[0].split(':')[1]
-        sensor_type, sensor_value = coma_list[1].split(':')
+        node_number  = "-1" 
+        sensor_type  = "nosensor"
+        sensor_value = "-1.0"
+
+        coma_list    = line_str.split(',')
+        keys1 = []
+        keys2 = []
+
+        if (len(coma_list) < 2):
+            sensor_type  = "blogmessage"
+            return node_number, sensor_type, sensor_value
+        else:
+            keys1 = coma_list[0].split(':')
+            keys2 = coma_list[1].split(':')
+
+        if (len(keys1) > 1):
+            #if keys[0] == "nodeid"
+            node_number = keys1[1] 
+        else:
+            # No node id found
+            node_number = "-2"
+
+        if (len(keys2) > 1):
+            sensor_type  = keys2[0]
+            sensor_value = keys2[1]
+        # else sensor_type = "nosensor"
+
         return node_number, sensor_type, sensor_value
         
     def run(self):
@@ -53,7 +77,7 @@ class Server():
             try:
                 print("Parsing line: "+rline)
                 node_number, sensor_type, sensor_value = self.parse_line(rline)
-                self.df.loc[self.row_iter] =  [datetime.datetime.utcnow(),node_number, sensor_type, float(sensor_value)]
+                self.df.loc[self.row_iter] =  [datetime.datetime.utcnow(), node_number, sensor_type, float(sensor_value)]
                 self.row_iter += 1
                 self.df.to_csv('../../test.csv',index = False)
 
