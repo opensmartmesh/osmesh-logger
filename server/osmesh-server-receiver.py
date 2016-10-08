@@ -10,6 +10,8 @@ class Server():
         '''Constructor with default values only
 
         TODO have default values and user values as input
+        
+        test
         '''
         self.serial_port     = serial_port
         self.serial_baudrate = 115200
