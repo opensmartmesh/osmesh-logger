@@ -76,6 +76,7 @@ class Server():
             rline = self.readlineCR(port)
             try:
                 print("Parsing line: "+rline)
+                # TODO replace with database transfer
                 node_number, sensor_type, sensor_value = self.parse_line(rline)
                 self.df.loc[self.row_iter] =  [datetime.datetime.utcnow(), node_number, sensor_type, float(sensor_value)]
                 self.row_iter += 1
