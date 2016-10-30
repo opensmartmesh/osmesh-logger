@@ -7,7 +7,16 @@ saved in the databse.
 To see how the server interacts with the database see osmesh-server-api
 
 
-# Run the C++ translator
+# Compile and Run the  C++ translator
+
+## Compiling
+
+You need to have scons installed
+
+To compile use hit:
+scons
+
+## Running the logger
 
 help 
 
