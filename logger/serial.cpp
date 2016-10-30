@@ -139,12 +139,12 @@ void Serial::start(std::string port_name,bool s_500)
 bool Serial::update()
 {
 	bool res = false;
-	n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
+	n = read (fd, buf, sizeof(buf));  // read up to 100 characters if ready to read
 	if(n > 0)
 	{
 		res = true;
 		//as we want to print it here, we make sure it is null terminated
-		if(n < sizeof buf)
+		if(n < sizeof(buf))
 		{
 			buf[n] = '\0';//null terminated string
 		}
@@ -209,7 +209,7 @@ void Serial::logBuffer()
 	}
 }
 
-void Serial::send(char* buffer,int size)
+int Serial::send(char* buffer,int size)
 {
-	write(fd,buffer,size);
+	return write(fd,buffer,size);
 }

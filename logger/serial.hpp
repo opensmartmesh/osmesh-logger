@@ -19,7 +19,7 @@ class Serial
 private:
 	int fd;
 	char buf [buf_size];
-	int n;
+	std::size_t n;
 	bool newLine;
 public:
 	std::string 	Name;
@@ -32,7 +32,7 @@ public:
 	bool update();
 	void log(const std::string &str);
 	void logBuffer();
-	void send(char* buffer,int size);
+	int send(char* buffer,int size);
 	
 };
 
