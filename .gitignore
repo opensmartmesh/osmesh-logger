@@ -2,3 +2,6 @@
 *.o
 *.scons*
 build
+*.db
+*.csv
+__pycache__

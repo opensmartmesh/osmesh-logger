@@ -6,6 +6,14 @@ saved in the databse.
 
 To see how the server interacts with the database see osmesh-server-api
 
+__Here is a global picture of the logger__
+
+           \                        /            \       /
+    osmesh  |--> | USB UART | ---> |  Translator  |-->  |  Archiver
+    node   /                        \   c++      /       \  python
+
+The logger is the sum of the Translator and the Archiver.
+Translator and Archiver might be fused later into the same application.
 
 # Compile and Run the  C++ translator
 
@@ -13,12 +21,16 @@ To see how the server interacts with the database see osmesh-server-api
 
 You need to have scons installed
 
-To compile use hit:
-scons
+To compile:
+    # cd osmesh-logger/translator
+    # scons
 
 ## Running the logger
 
-help 
+    # cd osmesh-logger/translator
+    # ./ser
+
+Here are command line options:
 
 Command line example 
 './ser param1=value1 param2=value2':
