@@ -15,9 +15,9 @@ __Here is a global picture of the logger__
 The logger is the sum of the Translator and the Archiver.
 Translator and Archiver might be fused later into the same application.
 
-# Compile and Run the  C++ translator
+## How to compile and run the  C++ translator
 
-## Compiling
+### Compiling
 
 You need to have scons installed
 
@@ -25,7 +25,7 @@ To compile:
     # cd osmesh-logger/translator
     # scons
 
-## Running the logger
+### Running the logger
 
     # cd osmesh-logger/translator
     # ./ser
@@ -51,3 +51,13 @@ Parameters:
 - configfile:
   Optional if not provided, an attempt is made to read config from 'configfile.txt' if available.
   e.g 'configfile=conf2.txt'
+
+## How to run the python archiver
+
+    # cd osmesh-logger/archiver
+    # python main.py
+
+For now the archiver is not linked to the translator, so it is awaiting for some
+data from the serial port, sent by an arduino for instance.
+
+
