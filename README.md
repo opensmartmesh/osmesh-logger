@@ -28,7 +28,7 @@ To compile:
 ```
 ### Running the logger
 
-    # cd osmesh-logger/translator
+    # cd osmesh-logger/translator/build
     # ./ser
 
 ### Command line options
