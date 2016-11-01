@@ -59,7 +59,7 @@ Parameters:
 ## How to run the python archiver
 ```
 # cd osmesh-logger/archiver
-# python main.py
+# python main.py /dev/ttyACM0
 ```
 For now the archiver is not linked to the translator, so it is awaiting for some
 data from the serial port, sent by an arduino for instance.
