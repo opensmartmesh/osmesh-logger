@@ -22,19 +22,23 @@ Translator and Archiver might be fused later into the same application.
 You need to have scons installed
 
 To compile:
-    # cd osmesh-logger/translator
-    # scons
-
+```
+# cd osmesh-logger/translator
+# scons
+```
 ### Running the logger
 
     # cd osmesh-logger/translator
     # ./ser
 
-Here are command line options:
+### Command line options
 
-Command line example 
-'./ser param1=value1 param2=value2':
-
+Command line examples 
+```
+# ./ser
+# ./ser port=/dev/ttyUSB0 logfile=logfile.txt
+# ./ser configfile=conf2.txt
+```
 Parameters:
 
 - port:	the serial device to be used
@@ -53,10 +57,10 @@ Parameters:
   e.g 'configfile=conf2.txt'
 
 ## How to run the python archiver
-
-    # cd osmesh-logger/archiver
-    # python main.py
-
+```
+# cd osmesh-logger/archiver
+# python main.py
+```
 For now the archiver is not linked to the translator, so it is awaiting for some
 data from the serial port, sent by an arduino for instance.
 
