@@ -3,12 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
 
 #include "serial.hpp"
 //for getTime
 #include "utils.hpp"
 
+#include "bme280_server.hpp"
 
 #include <stdio.h>
 #include <errno.h>
@@ -93,6 +93,17 @@ int set_interface_attribs (int fd, speed_t baudrate, int parity)
         return 0;
 }
 
+
+LogBuffer_c::LogBuffer_c()
+{
+	newLine = true;//must start with a timestamp on the first write;
+	plinebuf = linebuf;//points on the beginning of the line buffer
+}
+
+Serial::Serial()
+{
+}
+
 void Serial::start_logfile(std::string fileName)
 {
 	logfile.open(fileName.c_str(), (std::ios::out|std::ios::app) );
@@ -100,7 +111,6 @@ void Serial::start_logfile(std::string fileName)
 	{
 		printf("could not open log file:%s\r\n",fileName.c_str());
 	}
-	newLine = true;//starts with timestamp on first write;
 }
 
 void Serial::start(std::string port_name,bool s_500)
@@ -136,15 +146,15 @@ void Serial::start(std::string port_name,bool s_500)
 	log(strlog);
 }
 
-bool Serial::update()
+bool LogBuffer_c::update(int fd)
 {
 	bool res = false;
-	n = read (fd, buf, sizeof(buf));  // read up to 100 characters if ready to read
+	n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
 	if(n > 0)
 	{
 		res = true;
 		//as we want to print it here, we make sure it is null terminated
-		if(n < sizeof(buf))
+		if(n < sizeof buf)
 		{
 			buf[n] = '\0';//null terminated string
 		}
@@ -155,6 +165,11 @@ bool Serial::update()
 		}
 	}
 	return res;
+}
+
+bool Serial::update()
+{
+	return logbuf.update(fd);//update the content of the local buffer from the serial device
 }
 
 void Serial::log(const std::string &str)
@@ -169,47 +184,101 @@ void Serial::log(const std::string &str)
 
 }
 
-//we use Serial::buf for data and Serial::n for data size
-void Serial::logBuffer()
+void Serial::processLine()
 {
-	std::stringstream sLog;
-		if(n>0)
+	(*logbuf.plinebuf) = '\0';
+	std::string logline(logbuf.linebuf);
+	//reset the line buffer pointer to the beginning of the line
+	logbuf.plinebuf = logbuf.linebuf;
+	
+	
+	strmap notif_map;
+	utl::str2map( logline, notif_map);
+	
+	
+	if(utl::exists(notif_map,"BME280") && utl::exists(notif_map,"NodeId") )
+	{
+		measures.set_all_measures_Text(notif_map["BME280"]);
+		if(isLogOut)
 		{
-			char * buf_w = buf;
-			char * buf_end = buf + n;
-			while(buf_w != buf_end)
-			{
-				bool isp = isprint(*buf_w);
-				//avoid empty lines do not create a new timestamp if the char is a line ending
-				if(newLine && isp)
-				{
-				sLog << utl::getDay() << "\t" << utl::getTime() << "\t";
-					newLine = false;
-				}
-				if((*buf_w) == '\n')//only allowed printable character
-				{
-					newLine = true;
-				sLog.put(*buf_w);
-				}
-				else if(isp)//skip the CR and any other control
-				{
-				sLog.put(*buf_w);
-				}
-				buf_w++;
-			}
+			std::cout 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Temperature:" << measures.get_temperature() << std::endl;
+			std::cout 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Humidity:" << measures.get_humidity()  << std::endl;
+			std::cout 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Pressure:" << measures.get_pressure()  << std::endl;
 		}
-	if(isLogOut)
-	{
-		std::cout << sLog.str();//already contain end of line
+		if(isLogFile && logfile.is_open())
+		{
+			logfile 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Temperature:" << measures.get_temperature() << std::endl;
+			logfile 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Humidity:" << measures.get_humidity()  << std::endl;
+			logfile 	<< logbuf.day << "\t" << logbuf.time << "\t" 
+						<< "NodeId:" << notif_map["NodeId"]
+						<< ";Pressure:" << measures.get_pressure()  << std::endl;
+			logfile.flush();
+		}
+
+		
 	}
-	if(isLogFile && logfile.is_open())
+	else//other logs that do not need pre-formatting
 	{
-		logfile << sLog.str();//already contain end of line
-	logfile.flush();
+		if(isLogOut)
+		{
+			std::cout << logbuf.day << "\t" << logbuf.time << "\t" << logline;
+		}
+		if(isLogFile && logfile.is_open())
+		{
+			logfile << logbuf.day << "\t" << logbuf.time << "\t" << logline;
+			logfile.flush();
+		}
 	}
 }
 
-int Serial::send(char* buffer,int size)
+//we use Serial::buf for data and Serial::n for data size
+void Serial::logBuffer()
 {
-	return write(fd,buffer,size);
+	if(logbuf.n>0)
+	{
+		char * buf_w = logbuf.buf;
+		char * buf_end = logbuf.buf + logbuf.n;
+		
+		while(buf_w != buf_end)
+		{
+			bool isp = isprint(*buf_w);
+
+			//Timestamping : avoid empty lines do not create a new timestamp if the char is a line ending
+			if(logbuf.newLine && isp)
+			{
+				logbuf.day = utl::getDay();
+				logbuf.time = utl::getTime();
+				logbuf.newLine = false;
+			}
+
+			//Process characters
+			if((*buf_w) == '\n')//only allowed printable character
+			{
+				logbuf.newLine = true;
+				(*logbuf.plinebuf++) = (*buf_w);
+				processLine();
+			}
+			else if(isp)//skip the CR and any other control
+			{
+				(*logbuf.plinebuf++) = (*buf_w);
+			}
+			//else non printable characters other than '\n' are discarded
+			buf_w++;
+		}
+	}
+}
+
+void Serial::send(char* buffer,int size)
+{
+	write(fd,buffer,size);
 }

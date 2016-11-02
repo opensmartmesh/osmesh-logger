@@ -1,5 +1,5 @@
 
-//for usleep
+//for usleep() sleep()
 #include <unistd.h>
 //for printf
 #include <stdio.h>
@@ -41,8 +41,8 @@ void help_arguments()
 int main( int argc, char** argv )
 {
 	strmap conf;
-	utl::args2map(argc,argv,conf);
 	Serial 		ser;
+	ser.exepath = utl::args2map(argc,argv,conf);
 
 	if(utl::exists(conf,"logfile"))
 	{
@@ -69,10 +69,13 @@ int main( int argc, char** argv )
 		exit(1);
 	}
 	
+	std::string fullfilepath = ser.exepath + "/calib_data.txt";
+	ser.measures.load_calib_data(fullfilepath);
 	
 
-	
+	//#2 issue, it is likely that someone else is using the port in parallel
 	//discard first trash buffer if available right after opening the port
+	//this discard measure is not enough as ibberish appears still
 	ser.update();
 	
 	while (1) 
@@ -81,7 +84,7 @@ int main( int argc, char** argv )
 		{
 			ser.logBuffer();
 		}
-		usleep(500000);
+		sleep(1);
 		
 	}
 

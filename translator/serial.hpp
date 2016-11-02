@@ -7,20 +7,43 @@ serial port cpp wrapper
 
 */
 
+#include "bme280_server.hpp"
+
 #include <linux/joystick.h>
 #include <string>
 //for file
 #include <fstream>
+//for stringstream
+#include <sstream>
 
 #define buf_size 2000
 
+class LogBuffer_c
+{
+public:
+	LogBuffer_c();//constructor
+public:
+	char buf [buf_size];
+	char linebuf [buf_size];
+	char * plinebuf;//has to be global to keep half lines position
+	int n;
+	bool newLine;
+	std::string day;
+	std::string time;
+	std::string line;
+public:
+	bool update(int fd);
+};
+
 class Serial
 {
+public:
+	Serial();//constructor
 private:
 	int fd;
-	char buf [buf_size];
-	std::size_t n;
-	bool newLine;
+	LogBuffer_c logbuf;
+public:
+	bme_measures_c measures;
 public:
 	std::string 	Name;
 	std::ofstream 	logfile;
@@ -30,9 +53,11 @@ public:
 	void start(std::string port_name,bool s_500 = false);
 	void start_logfile(std::string fileName);
 	bool update();
-	void log(const std::string &str);
+	void log(const std::string &str);//append timestamp and output to file and cout
 	void logBuffer();
-	int send(char* buffer,int size);
-	
+	void send(char* buffer,int size);
+	void processLine();
+public:
+	std::string exepath;
 };
 

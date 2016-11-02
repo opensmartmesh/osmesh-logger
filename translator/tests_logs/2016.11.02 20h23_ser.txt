@@ -1,0 +1,20 @@
+pi@ioserv:~/osm/translator/build $ ./ser
+configfile = ./configfile.txt
+logout = 1
+port = /dev/ttyUSB0
+2016-11-02      19:19:27        port /dev/ttyUSB0 is open @B115200
+Loading calib file(./calib_data.txt)
+2016-11-02      19:19:28        MQ 1=J?f{AE%DN.F"0ubRH
+2016-11-02      19:19:28        u[sS@}\vrv'G6zL F"@j
+2016-11-02      19:19:37        __________________________________________________
+2016-11-02      19:19:37        sensors_logger\firmware_rf_dongle\rf_receiver_logger\
+2016-11-02      19:19:38        NodeId:4,is:Alive
+2016-11-02      19:19:51        NodeId:6,is:Alive
+2016-11-02      19:19:51        NodeId:6,Light: 1930
+2016-11-02      19:20:04        NodeId:4,is:Alive
+2016-11-02      19:20:19        NodeId:6,is:Alive
+2016-11-02      19:20:19        NodeId:6,Light: 1930
+2016-11-02      19:20:24        NodeId:7;Temperature:22.16 °C
+2016-11-02      19:20:24        NodeId:7;Humidity:43.530 %RH
+2016-11-02      19:20:24        NodeId:7;Pressure:983.323 hPa
+2016-11-02      19:20:30        NodeId:4,is:Alive
