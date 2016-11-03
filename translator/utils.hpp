@@ -23,7 +23,7 @@ namespace utl
 	void remove(const std::string &substr, std::string &str);
 	
 	void hextext2data(const std::string &str, uint8_t *data);
-	std::string data2hextext(const uint8_t *data,int data_size);
+	std::string data2hextext(const uint8_t *data, const std::size_t& data_size);
 }
 
 #endif /*__UTILS__*/

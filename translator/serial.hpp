@@ -26,7 +26,7 @@ public:
 	char buf [buf_size];
 	char linebuf [buf_size];
 	char * plinebuf;//has to be global to keep half lines position
-	int n;
+	std::size_t n;
 	bool newLine;
 	std::string day;
 	std::string time;

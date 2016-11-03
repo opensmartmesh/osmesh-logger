@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 #include <time.h>
+#include <string>
 
 //for file
 #include <fstream>
@@ -10,6 +11,12 @@
 
 //for setfill
 #include <iomanip>
+
+// for isspace
+#include <ctype.h>
+
+// for std::remove_if
+#include <algorithm>
 
 using namespace std;
 
@@ -48,6 +55,7 @@ int char2int(char input)
 		return input - 'A' + 10;
 	if(input >= 'a' && input <= 'f')
 		return input - 'a' + 10;
+	return 0; //static_cast<int>('\0');
 }
 
 void utl::hextext2data(const std::string &str, uint8_t *data)
@@ -59,35 +67,49 @@ void utl::hextext2data(const std::string &str, uint8_t *data)
 	utl::remove_0x(v_str);
 	//std::cout << "C3: " << v_str << std::endl;
 	int i=0;
-	while(i<v_str.length()-1)
+	while( i < static_cast<int>(v_str.length())-1)
 	{
 		*(data++) = char2int(v_str[i])*16 + char2int(v_str[i+1]);
 		i += 2;
 	}
+
+	// Else you-ve got things like that:
+	//
+	// std::string s = "0xfffefffe";
+	// std::cout << s << "                 ";
+	// 							unsigned int x = std::stoul(s, nullptr, 16);
+	// std::cout << x << std::endl;
+	//
 }
 
 //doesn work
 //input : 0x23 0xCA 0x5F
 //output : 0x0# 0▒ 0_
-std::string data2hextext_(const uint8_t *data,int data_size)
+/*
+std::string data2hextext_(const uint8_t *data, const std::size_t& data_size)
 {
 	std::stringstream s_text;
 	s_text << "0x";
-	for(int i=0;i<data_size;i++)
+	for(std::size_t i=0;i<data_size;i++)
 	{
 		s_text << std::hex << std::setfill('0') << std::setw(2) << data[i] << " ";
 	}
 	
 	return s_text.str();
 }
+*/
 
-std::string utl::data2hextext(const uint8_t *data,int data_size)
+/** Adding a comment here is very helpful
+ *
+ * Why do we need this here ?
+ */
+std::string utl::data2hextext(const uint8_t *data, const std::size_t& data_size)
 {
 	char text[data_size*3+1];
 	char* p_text = text;
 	sprintf(p_text,"0x");
 	p_text+=2;
-	for(int i=0;i<data_size;i++)
+	for(std::size_t i=0; i<data_size; i++)
 	{
 		sprintf(p_text,"%02X ",data[i]);
 		p_text+=3;
@@ -99,8 +121,14 @@ std::string utl::data2hextext(const uint8_t *data,int data_size)
 
 std::string utl::remove_spaces(std::string &str)
 {
-	//remove_if not found
-	//str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
+	//remove_if not found: it needs to be imported from algorithm
+	//isspace is in ctypes.h
+	//
+	str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+
+	return str; // not really necessary in the end, since argument is modified.
+
+	/*
 	std::string res;
     for(int i=0; i<str.size(); i++)
 	{
@@ -109,14 +137,20 @@ std::string utl::remove_spaces(std::string &str)
 	}
 	str = res;
     return res;	
+	*/
 }
 
 std::string utl::remove_0x(std::string &str)
 {
-	//remove_if not found
-	//str.erase(remove_if(str.begin(), str.end(), isspace), str.end());
-	std::string res;
-    for(int i=0; i<str.size()-1; i++)
+	std::string res="";
+
+	// useful if so that we can use a comparable-size_t for variable i
+	if (str.size() <= 2)
+	{
+		return res;
+	}
+
+    for(std::size_t i=0; i<str.size()-1; i++)
 	{
 		if((str[i]=='0') && (str[i+1]=='x'))
 		{
