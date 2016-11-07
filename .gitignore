@@ -4,5 +4,6 @@
 build
 *.db
 *.csv
+*.swp
 __pycache__
 translator/copy_to_rpi.bat
