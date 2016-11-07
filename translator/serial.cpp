@@ -113,6 +113,7 @@ void Serial::start_logfile(std::string fileName)
 	}
 }
 
+/** Start to open the serial port with specific options */
 void Serial::start(std::string port_name,bool s_500)
 {
 	std::string strlog;

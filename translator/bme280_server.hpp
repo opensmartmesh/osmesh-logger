@@ -17,7 +17,7 @@
 #include <string>
 
 
-
+/** Object to manage BME measurements calibration */
 class bme_measures_c
 {
 	//----------------------- Measures ----------------------- 
