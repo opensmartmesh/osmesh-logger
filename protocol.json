@@ -1,0 +1,86 @@
+//------------------------------------ update ------------------------------------
+//- Example usecase 1 : on startup update of status of all nodes and sensors
+//- The nodes and sensors map usage allows combining multiple nodes and sensors 
+//  in the same update message, it is also recommended over array as it is more
+//  compact both on data size and gives better readability on code (C++ & javascript)
+//- The Times and Values arrays could have been here a simple map to valuea but array were
+// rather used simply for consistency with the request and response structures, same data structures
+{
+  "update": {
+	"6": {
+	  "Light": {
+		"Times": [1484478433],
+		"Values": [1187]
+	  },
+	  "Humidity": {
+		"Times": [1484478462],
+		"Values": [32.3076171875]
+	  },
+	  "Pressure": {
+		"Times": [1484478462],
+		"Values": [983.010986328125]
+	  },
+	  "Temperature": {
+		"Times": [1484478462],
+		"Values": [22.2999992370605]
+	  }
+	},
+	"7": {
+	  "Light": {
+		"Times": [1484478436],
+		"Values": [1223]
+	  },
+	  "Humidity": {
+		"Times": [1484478467],
+		"Values": [83.3486328125]
+	  },
+	  "Pressure": {
+		"Times": [1484478467],
+		"Values": [983.205810546875]
+	  },
+	  "Temperature": {
+		"Times": [1484478467],
+		"Values": [17.6599998474121]
+	  }
+	}
+  }
+}
+//------------------------------------update ------------------------------------
+// Example usecase 2 : update on every node's sensor's capture
+{
+  "update": {
+    "7": {
+      "Light": {
+        "Times": [1484479355],
+        "Values": [1279]
+      }
+    }
+  }
+}
+//------------------------------------request ------------------------------------
+//- The Nodes and sensors maps are not used in the request response structures
+//  to enforce a request for a single node's sensor
+{
+  "request": {
+    "id": 1736,
+    "type": "Duration",
+    "NodeId": 6,
+    "SensorName": "Temperature",
+    "start": 1484384400000,
+    "stop": 1484385000000
+  }
+}
+
+//------------------------------------ response ------------------------------------
+//- The array of times and values is preferred over an array of a structures containing
+// times and values due to the huge impact it can have on response size
+// => it avoids repeating "Time" and "Value" text words to the number pr array elements
+{
+  "response": {
+    "id": 1736
+    "NodeId": 6,
+    "SensorName": "Temperature",
+    "Times": [1484384480,1484384898,1484384957],
+    "Values": [21.8299999237061,21.8700008392334,21.8700008392334]
+  }
+}
